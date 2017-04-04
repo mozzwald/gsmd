@@ -36,7 +36,7 @@
 #include <gsmd/gsmd.h>
 
 static FILE *logfile;
-static FILE syslog_dummy;
+static FILE *syslog_dummy;
 static int loglevel;
 
 static int gsmd2syslog[] = {
@@ -66,7 +66,7 @@ void __gsmd_log(int level, const char *file, int line, const char *function,
 	if (level < loglevel)
 		return;
 	
-	if (logfile == &syslog_dummy) {
+	if (logfile == syslog_dummy) {
 		va_start(ap, format);
 		vsyslog(gsmd2syslog_level(level), format, ap);
 		va_end(ap);
@@ -94,7 +94,7 @@ int gsmdlog_init(const char *path)
 {
 	
 	if (!strcmp(path, "syslog")) {
-		logfile = &syslog_dummy;
+		logfile = syslog_dummy;
 		openlog("gsmd", 0, LOG_DAEMON);
 	} else {
 		logfile = fopen(path, "a+");
